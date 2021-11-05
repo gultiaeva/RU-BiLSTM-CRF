@@ -127,3 +127,16 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# PyCharm data
+.idea/
+
+# Dataset, model weights, word embeddings, vocabulaty data etc.
+data/dataset/*
+data/embeddings/*
+data/model/*
+data/vocab/*
+
+# Logs
+logs/*
