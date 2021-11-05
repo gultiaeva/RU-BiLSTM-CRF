@@ -136,6 +136,7 @@ dmypy.json
 data/dataset/*
 data/embeddings/*
 data/model/*
+data/checkpoints/*
 data/vocab/*
 
 # Logs
