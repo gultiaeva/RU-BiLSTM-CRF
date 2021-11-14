@@ -129,3 +129,33 @@ class UniversalDependenciesDatasetReader(DatasetReader):
 
         fields["metadata"] = MetadataField({"words": words, "labels": labels, "pos": upos_tags})
         return Instance(fields)
+
+
+@DatasetReader.register("simple_string_reader", exist_ok=True)
+class SimpleStringReader(DatasetReader):
+    """
+    Simple wrapper to work with SentenceTaggerPredictor.
+
+    # Parameters
+
+    token_indexers : `Dict[str, TokenIndexer]`, optional (default=`{"tokens": SingleIdTokenIndexer()}`)
+        The token indexers to be applied to the words TextField.
+    """
+
+    def __init__(
+            self,
+            token_indexers: Dict[str, TokenIndexer] = None,
+            **kwargs
+    ) -> None:
+        super().__init__(**kwargs)
+        self._token_indexers = token_indexers or {"tokens": SingleIdTokenIndexer()}
+
+    @overrides
+    def text_to_instance(self, tokens: List[Token]) -> Instance:
+
+        fields: Dict[str, Field] = {}
+
+        text_field = TextField(tokens, self._token_indexers)
+        fields["tokens"] = text_field
+        fields["metadata"] = MetadataField({"words": tokens})
+        return Instance(fields)
