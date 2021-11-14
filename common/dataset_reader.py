@@ -1,3 +1,4 @@
+import gzip
 import logging
 from typing import Dict, Tuple, List
 
@@ -48,7 +49,7 @@ class UniversalDependenciesDatasetReader(DatasetReader):
         # if `file_path` is a URL, redirect to the cache
         file_path = cached_path(file_path)
 
-        with open(file_path, "r", encoding="utf8") as conllu_file:
+        with gzip.open(file_path, "rt", encoding="utf8") as conllu_file:
             logger.info("Reading UD instances from conllu dataset at: %s", file_path)
 
             for annotation in parse_incr(conllu_file):
