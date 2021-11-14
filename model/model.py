@@ -27,13 +27,13 @@ class BiLSTMCRF(CrfTagger):
                 weight_file=self.elmo_weights_file
             )
             embed_dim = token_embedding.output_dim
-            word_embeddings = BasicTextFieldEmbedder({'elmo_tokens': token_embedding})
         else:
             token_embedding = Embedding(
                 num_embeddings=vocab.get_vocab_size('tokens'),
                 embedding_dim=embed_dim
             )
-            word_embeddings = BasicTextFieldEmbedder({'tokens': token_embedding})
+
+        word_embeddings = BasicTextFieldEmbedder({'tokens': token_embedding})
 
         bidirectional_lstm = nn.LSTM(
             embed_dim,
