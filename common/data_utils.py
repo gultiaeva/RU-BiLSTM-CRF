@@ -11,9 +11,9 @@ def get_conllu_data_loader(path_to_data,
                            max_instances_in_memory=None,
                            use_elmo_token_indexer=False,
                            cuda_device=None,
-                           **kwargs, ):
+                           **kwargs):
     if use_elmo_token_indexer:
-        token_indexer = {'elmo_tokens': ELMoTokenCharactersIndexer()}
+        token_indexer = {'tokens': ELMoTokenCharactersIndexer()}
     else:
         token_indexer = None
 
