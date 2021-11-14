@@ -49,6 +49,7 @@ class BiLSTMCRF(CrfTagger):
             text_field_embedder=word_embeddings,
             encoder=encoder,
             dropout=dropout,
+            label_encoding='BIO',
+            calculate_span_f1=True,
+            verbose_metrics=True
         )
-
-
