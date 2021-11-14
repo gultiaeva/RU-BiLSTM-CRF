@@ -135,8 +135,7 @@ dmypy.json
 # Dataset, model weights, word embeddings, vocabulaty data etc.
 data/dataset/*
 data/embeddings/*
-data/model/*
-data/checkpoints/*
+data/models/*
 data/vocab/*
 
 # Logs
