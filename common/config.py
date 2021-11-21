@@ -8,6 +8,7 @@ with open('config.json', encoding='utf8') as f:
 
 @dataclass
 class Config:
+    """Configuration data."""
     name: str
 
     # Data

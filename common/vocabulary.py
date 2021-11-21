@@ -4,10 +4,23 @@ from allennlp.data.vocabulary import Vocabulary
 
 from common.dataset_reader import UniversalDependenciesDatasetReader
 from common.utils import wipe_dir
+
 logging.getLogger(__name__)
 
 
-def build_vocab(*paths, save_dir_path, overwrite=True):
+def build_vocab(*paths, save_dir_path: str, overwrite: bool = True) -> None:
+    """
+    Builds vocabulary from files.
+
+    :param paths: One or many dataset files.
+    :type paths: str
+    :param save_dir_path: Path to directory to save result vocabulary.
+    :type save_dir_path: str
+    :param overwrite: Overwrite existing vocabulary if it already exists.
+    :type overwrite: bool
+
+    :return: None
+    """
     if overwrite:
         wipe_dir(save_dir_path)
     reader = UniversalDependenciesDatasetReader()
@@ -19,7 +32,16 @@ def build_vocab(*paths, save_dir_path, overwrite=True):
     vocabulary.save_to_files(save_dir_path)
 
 
-def load_vocab(path_to_vocab_dir):
+def load_vocab(path_to_vocab_dir: str) -> Vocabulary:
+    """
+    Loads vocabulary from directory.
+
+    :param path_to_vocab_dir: Path to directory where vocabulary was saved.
+    :type path_to_vocab_dir: str
+
+    :return: Loaded vocabulary.
+    :rtype: allennlp.data.vocabulary.Vocabulary
+    """
     vocabulary = Vocabulary.from_files(path_to_vocab_dir)
     return vocabulary
 

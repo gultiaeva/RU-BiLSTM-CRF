@@ -1,4 +1,5 @@
 import logging
+from typing import Union, Dict, Any
 
 import torch
 from allennlp.predictors import SentenceTaggerPredictor
@@ -18,10 +19,73 @@ logging.getLogger(__name__)
 
 
 class NERModel:
-    def __init__(self, model_name, vocabulary_dir, train_dataset_file, test_dataset_file,
-                 use_elmo_embeddings=False, elmo_options_file=None, elmo_weights_file=None,
-                 use_gru_instead_of_lstm=False, embedding_dim=172, hidden_dim=256, dropout=.1, learning_rate=0.01,
-                 optimizer=None, checkpoints_dir=None, model_serialization_dir=None, use_cuda=True):
+    """
+    Model for Named Entity Recognition.
+
+    The `NERModel` class wraps building BiLSTM+CRF/BiGRU+CRF model, reading dataset in batches, selecting an optimizer
+    setting up early stopping and serialization directories, train and predict processes.
+
+    :param model_name: Model name for further identification purpose.
+    :type model_name: str
+    :param vocabulary_dir: Path to directory with dataset vocabulary.
+    :type vocabulary_dir: str
+    :param train_dataset_file: Path to training dataset file.
+    :type train_dataset_file: str
+    :param test_dataset_file: Path to testing dataset file.
+    :type test_dataset_file: str
+    :param use_elmo_embeddings: Use pretrained ELMo model to embed sequence.
+    :type use_elmo_embeddings: bool
+    :param elmo_options_file: Path to pretrained ELMo model options file (Usually named options.json).
+        Used only if `use_elmo` is `True`.
+    :type elmo_options_file: str or None
+    :param elmo_weights_file:  Path to pretrained ELMo model weights file (usually named model.hdf5).
+        Used only if `use_elmo` is `True`.
+    :type elmo_weights_file: str or None
+    :param use_gru_instead_of_lstm: Set up GRU instead of LSTM.
+    :type use_gru_instead_of_lstm: bool
+    :param embedding_dim: Embedding dimension. Used only if `use_elmo` is `False`.
+        If `use_elmo` is `True` then uses embedding dimension from pretrained ELMo model.
+    :type embedding_dim: int
+    :param hidden_dim: Hidden dimension in Seq2Seq model.
+    :type hidden_dim: int
+    :param dropout: Dropout regularization. Disables random neuron with `dropout` probability on training iterations.
+    :type dropout: float
+    :param learning_rate: Determines the step size of optimization algorithm
+    :type learning_rate: float
+    :param optimizer: Model optimization algorithm for training.
+    :type optimizer: torch.optim.Optimizer or None
+    :param checkpoints_dir: Directory to store model checkpoints. If `None` then no checkpoints will be created.
+        If provided then checkpoints will be created every hour of training.
+    :type checkpoints_dir: str or None
+    :param model_serialization_dir: Model serialization directory.
+        If provided then model weights will be serialized in this directory after training is completed.
+        If None then model will not be serialized after training process.
+    :type model_serialization_dir: str or None
+    :param use_cuda: Usage of CUDA device.
+        If `True` then all operations will be performed on CUDA device if it available.
+        If `False` then all operations will be performed on CPU, regardless of availability of CUDA.
+    :type use_cuda: bool
+    """
+    def __init__(self,
+                 model_name: str,
+                 vocabulary_dir: str,
+                 train_dataset_file: str,
+                 test_dataset_file: str,
+                 use_elmo_embeddings: bool = False,
+                 elmo_options_file: Union[str, None] = None,
+                 elmo_weights_file: Union[str, None] = None,
+                 use_gru_instead_of_lstm: bool = False,
+                 embedding_dim: int = 172,
+                 hidden_dim: int = 256,
+                 dropout: float = .1,
+                 learning_rate: float = 0.01,
+                 optimizer: Union[Optimizer, None] = None,
+                 checkpoints_dir: Union[str, None] = None,
+                 model_serialization_dir: Union[str, None] = None,
+                 use_cuda: bool = True) -> None:
+        """
+        :raises: FileNotFoundError if no vocabulary detected.
+        """
 
         self.model_name = model_name
 
@@ -82,7 +146,13 @@ class NERModel:
         self._is_predictor_initialized = False
         self._is_model_trained = False
 
-    def get_info(self):
+    def get_info(self) -> Dict[str, Any]:
+        """
+        Gets essential model params.
+
+        :return: Model params
+        :rtype: dict
+        """
         info = {
             'model_name': self.model_name,
             'has_elmo_embeddings': self.use_elmo_embeddings,
@@ -93,13 +163,42 @@ class NERModel:
         }
         return info
 
-    def load_model_state(self, checkpoint_path):
+    def load_model_state(self, checkpoint_path: str) -> None:
+        """
+        Loads model state from file (with extension `.th`).
+
+        :param checkpoint_path:
+        :return:
+        """
         with open(checkpoint_path, 'rb') as model_state:
             state_dict = torch.load(model_state)
             self.model.load_state_dict(state_dict)
         self._is_model_trained = True
 
-    def fit(self, epochs=20, early_stopping_patience=3, batch_size=256, shuffle=False, max_instances_in_memory=1000):
+    def fit(self,
+            epochs: int = 20,
+            early_stopping_patience: int = 3,
+            batch_size: int = 256,
+            shuffle: bool = False,
+            max_instances_in_memory: int = 1000) -> None:
+        """
+        Launches train process.
+
+        :param epochs: Number of epochs of training.
+        :type epochs: int
+        :param early_stopping_patience: Number of epochs to be patient before early stopping:
+            the training is stopped after patience epochs with no improvement.
+            If given, it must be > 0. If None, early stopping is disabled.
+        :type early_stopping_patience: int
+        :param batch_size: Size of a single training batch (in sentences, not in documents).
+        :type batch_size: int
+        :param shuffle: Provide shuffling in batches.
+        :type shuffle: bool
+        :param max_instances_in_memory: Maximum sentences that can be stored in memory at once. None for no limitation.
+        :type max_instances_in_memory: int
+
+        :return: None
+        """
 
         data_loader_train = get_conllu_data_loader(
             path_to_data=self.train_dataset_file,
@@ -145,12 +244,26 @@ class NERModel:
 
         self._is_model_trained = True
 
-    def _init_predictor(self):
+    def _init_predictor(self) -> None:
+        """
+        Initializes SentenceTaggerPredictor if not initialized yet.
+
+        :return: None
+        """
         reader = get_string_reader(use_elmo_token_indexer=self.use_elmo_embeddings)
         self._predictor = SentenceTaggerPredictor(self.model, reader, language='ru_core_news_sm')
         self._predictor_initialized = True
 
-    def predict(self, sentence):
+    def predict(self, sentence: str) -> Dict[str, Any]:
+        """
+        Splits raw text into tokens and then predicts label to each token.
+
+        :param sentence: Raw text for prediction.
+        :type sentence: str
+
+        :return: Tagged sentence with some meta information.
+        :rtype: dict
+        """
         assert self._is_model_trained, 'Model is not trained! You must fit model first.'
         if not self._is_predictor_initialized:
             self._init_predictor()
@@ -166,8 +279,8 @@ if __name__ == '__main__':
     elmo_options = 'data/embeddings/elmo/options.json'
     elmo_weights = 'data/embeddings/elmo/model.hdf5'
 
-    checkpoints_directory = 'data/models/model_lstm_elmo1/checkpoints'
-    serialization_directory = 'data/models/model_lstm_elmo1'
+    checkpoints_directory = 'data/models/model_lstm_elmo/checkpoints'
+    serialization_directory = 'data/models/model_lstm_elmo'
 
     name = 'BiLSTM+CRF+ELMo'
     elmo_embeddings = True

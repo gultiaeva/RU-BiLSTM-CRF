@@ -14,7 +14,8 @@ from overrides import overrides
 logger = logging.getLogger(__name__)
 
 
-# exist_ok has to be true until we remove this from the core library
+# Modified UniversalDependenciesDatasetReader from
+# allennlp_models.structured_prediction.dataset_readers.universal_dependencies
 @DatasetReader.register("universal_dependencies", exist_ok=True)
 class UniversalDependenciesDatasetReader(DatasetReader):
     """

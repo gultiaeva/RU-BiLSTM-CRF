@@ -8,6 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 class MetricsLoggerCallback(LogWriterCallback):
+    """
+    Callback for logging metrics while training model.
+    """
     def _to_params(self) -> Dict[str, Any]:
         pass
 
@@ -20,6 +23,9 @@ class MetricsLoggerCallback(LogWriterCallback):
         log_prefix: str = "",
         epoch: Optional[int] = None,
     ) -> None:
+        """
+        Metrics logger
+        """
         metrics = scalars
         metrics['current_epoch'] = self.trainer._epochs_completed + 1
         metrics['batches_completed'] = self.trainer._batches_in_epoch_completed

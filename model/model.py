@@ -1,6 +1,7 @@
-# -*- coding: utf-8 -*-
+from typing import Union
 
 import torch.nn as nn
+from allennlp.data.vocabulary import Vocabulary
 from allennlp.models import Model
 from allennlp.modules.seq2seq_encoders import PytorchSeq2SeqWrapper
 from allennlp.modules.text_field_embedders.basic_text_field_embedder import BasicTextFieldEmbedder
@@ -11,9 +12,43 @@ from allennlp_models.tagging import CrfTagger
 
 @Model.register("bilstm-crf")
 class BiLSTMCRF(CrfTagger):
-    def __init__(self, vocab,
-                 use_elmo=False, elmo_options_file=None, elmo_weights_file=None,
-                 use_gru_instead_of_lstm=False, embed_dim=172, hidden_dim=256, dropout=.1):
+    """
+    Bidirectional LSTM with CRF (Conditional Random Field) layer.
+    The `BiLSTMCRF` embeds a sequence, then uses Seq2Seq model (for ex. `LSTM` or `GRU`) on a sequence,
+    then uses a Conditional Random Field model to predict a tag for each token in the sequence.
+
+    Registered as a `Model` with name "bilstm-crf".
+
+    :param vocab: Vocabulary of dataset.
+    :type vocab: allennlp.data.vocabulary.Vocabulary
+    :param use_elmo: Use pretrained ELMo model to embed sequence.
+    :type use_elmo: bool
+    :param elmo_options_file: Path to pretrained ELMo model options file (Usually named options.json).
+        Used only if `use_elmo` is `True`.
+    :type elmo_options_file: str or None
+    :param elmo_weights_file: Path to pretrained ELMo model weights file (usually named model.hdf5).
+        Used only if `use_elmo` is `True`.
+    :type elmo_weights_file: str or None
+    :param use_gru_instead_of_lstm: Set up GRU instead of LSTM.
+    :type use_gru_instead_of_lstm: bool
+    :param embed_dim: Embedding dimension. Used only if `use_elmo` is `False`.
+        If `use_elmo` is `True` then uses embedding dimension from pretrained ELMo model.
+    :type embed_dim: int
+    :param hidden_dim: Hidden dimension in Seq2Seq model.
+    :type hidden_dim: int
+    :param dropout: Dropout regularization. Disables random neuron with `dropout` probability on training iterations.
+    :type dropout: float
+    """
+    def __init__(self, vocab: Vocabulary,
+                 use_elmo: bool = False,
+                 elmo_options_file: Union[str, None] = None,
+                 elmo_weights_file: Union[str, None] = None,
+                 use_gru_instead_of_lstm: bool = False,
+                 embed_dim: int = 172,
+                 hidden_dim: int = 256,
+                 dropout: float = .1) -> None:
+
+        assert (not use_elmo) or (use_elmo and elmo_options_file and elmo_weights_file), 'No pretrained ELMo provided!'
 
         self.use_gru_instead_of_lstm = use_gru_instead_of_lstm
         self.use_elmo = use_elmo

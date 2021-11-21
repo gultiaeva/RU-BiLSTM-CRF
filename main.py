@@ -8,7 +8,12 @@ from model import NERModel
 logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
+    """
+    Main endpoint to train model.
+
+    :return: None
+    """
     if not path_exists(configuration.vocabulary) or is_empty_dir(configuration.vocabulary):
         logging.info(f'No vocabulary detected at {configuration.vocabulary}. Building vocabulary...')
         build_vocab(configuration.train_data, configuration.test_data, configuration.validation_data,
