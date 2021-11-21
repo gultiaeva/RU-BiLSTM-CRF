@@ -5,6 +5,7 @@ import shutil
 from allennlp.data.data_loaders.multiprocess_data_loader import MultiProcessDataLoader
 from allennlp.data.token_indexers import ELMoTokenCharactersIndexer
 from torch import cuda
+from torch import device
 
 from common.dataset_reader import UniversalDependenciesDatasetReader, SimpleStringReader
 
@@ -31,14 +32,15 @@ def path_exists(path):
 def get_cuda_device_if_available():
 
     if cuda.is_available():
-        cuda_device = 0  # GPU
+        cuda_device = f'cuda:0'  # GPU
         device_name = cuda.get_device_name()
         logging.info(f'CUDA device is available. Using {device_name}.')
     else:
-        cuda_device = -1  # CPU
+        cuda_device = "cpu"  # CPU
         logging.info('No CUDA device detected. Using CPU.')
 
-    return cuda_device
+    return device(cuda_device)
+
 
 
 def get_conllu_data_loader(path_to_data,

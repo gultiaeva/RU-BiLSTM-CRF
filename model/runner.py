@@ -4,7 +4,8 @@ import torch
 from allennlp.predictors import SentenceTaggerPredictor
 from allennlp.training.checkpointer import Checkpointer
 from allennlp.training.gradient_descent_trainer import GradientDescentTrainer
-from torch.optim import Adam
+from torch import device
+from torch.optim import Adam, Optimizer
 
 from common import MetricsLoggerCallback
 from common.utils import get_conllu_data_loader, get_string_reader
@@ -64,7 +65,7 @@ class NERModel:
             self.device = get_cuda_device_if_available()
             self.model.cuda(self.device)
         else:
-            self.device = -1
+            self.device = device('cpu')
 
         # Optimizer init
         params = self.model.parameters()
@@ -117,7 +118,7 @@ class NERModel:
             use_elmo_token_indexer=self.use_elmo_embeddings
         )
 
-        if self.device != -1:
+        if self.device != device('cpu'):
             data_loader_train.set_target_device(self.device)
             data_loader_test.set_target_device(self.device)
 
