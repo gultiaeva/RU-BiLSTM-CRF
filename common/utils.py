@@ -14,6 +14,8 @@ logging.getLogger(__name__)
 
 def wipe_dir(path_to_dir):
     shutil.rmtree(path_to_dir, ignore_errors=True)
+    os.mkdir(path_to_dir)
+
 
 
 def create_dir_if_not_exists(path_to_dir):
