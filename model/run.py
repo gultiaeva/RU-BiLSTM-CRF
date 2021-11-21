@@ -6,8 +6,7 @@ from allennlp.training.checkpointer import Checkpointer
 from allennlp.training.gradient_descent_trainer import GradientDescentTrainer
 from torch.optim import Adam
 
-from common.data_utils import get_conllu_data_loader
-from common.dataset_reader import SimpleStringReader
+from common.utils import get_conllu_data_loader, get_string_reader
 from common.utils import get_cuda_device_if_available
 from common.vocabulary import load_vocab
 from model import BiLSTMCRF
@@ -129,7 +128,7 @@ class NERModel:
         self.get_info()
 
     def _init_predictor(self):
-        reader = SimpleStringReader()
+        reader = get_string_reader(use_elmo_token_indexer=self.use_elmo_embeddings)
         self._predictor = SentenceTaggerPredictor(self.model, reader, language='ru_core_news_sm')
         self._predictor_initialized = True
 

@@ -4,7 +4,7 @@ from allennlp.data.data_loaders.multiprocess_data_loader import MultiProcessData
 from allennlp.data.token_indexers import ELMoTokenCharactersIndexer
 from torch import cuda
 
-from common.dataset_reader import UniversalDependenciesDatasetReader
+from common.dataset_reader import UniversalDependenciesDatasetReader, SimpleStringReader
 
 logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ def get_conllu_data_loader(path_to_data,
                            cuda_device=None,
                            **kwargs):
     if use_elmo_token_indexer:
-        token_indexer = {'tokens': ELMoTokenCharactersIndexer()}
+        token_indexer = {'elmo_tokens': ELMoTokenCharactersIndexer()}
     else:
         token_indexer = None
 
@@ -48,3 +48,12 @@ def get_conllu_data_loader(path_to_data,
     if index_with_vocab is not None:
         data_loader.index_with(index_with_vocab)
     return data_loader
+
+
+def get_string_reader(use_elmo_token_indexer):
+    if use_elmo_token_indexer:
+        token_indexer = {'elmo_tokens': ELMoTokenCharactersIndexer()}
+    else:
+        token_indexer = None
+
+    return SimpleStringReader(token_indexers=token_indexer)
