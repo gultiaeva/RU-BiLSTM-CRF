@@ -28,8 +28,10 @@ if __name__ == '__main__':
     train_path = '../data/dataset/train_data.conllu.gz'
     test_path = '../data/dataset/test_data.conllu.gz'
     validation_path = '../data/dataset/validation_data.conllu.gz'
+    datasets_paths = [train_path, test_path, validation_path]
+
     vocab_dir = '../data/vocab'
 
-    build_vocab(train_path, test_path, validation_path, save_dir_path=vocab_dir)
+    build_vocab(*datasets_paths, save_dir_path=vocab_dir)
 
     vocab = load_vocab(vocab_dir)

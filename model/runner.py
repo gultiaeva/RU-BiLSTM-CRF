@@ -6,12 +6,12 @@ from allennlp.training.checkpointer import Checkpointer
 from allennlp.training.gradient_descent_trainer import GradientDescentTrainer
 from torch.optim import Adam
 
+from common import MetricsLoggerCallback
 from common.utils import get_conllu_data_loader, get_string_reader
 from common.utils import get_cuda_device_if_available
 from common.utils import path_exists, create_dir_if_not_exists, is_empty_dir
 from common.vocabulary import load_vocab, build_vocab
 from model import BiLSTMCRF
-from common import MetricsLoggerCallback
 
 logging.getLogger(__name__)
 
@@ -135,7 +135,6 @@ class NERModel:
         trainer.train()
 
         self._is_model_trained = True
-        self.get_info()
 
     def _init_predictor(self):
         reader = get_string_reader(use_elmo_token_indexer=self.use_elmo_embeddings)
@@ -151,35 +150,42 @@ class NERModel:
 
 
 if __name__ == '__main__':
+    vocab_dir = '../data/vocab'
+    train_file = '../data/dataset/train_data.conllu.gz'
+    test_file = '../data/dataset/test_data.conllu.gz'
 
-    vocab_dir = 'data/vocab'
-    train_file = 'data/dataset/train_data.conllu.gz'
-    test_file = 'data/dataset/test_data.conllu.gz'
-    elmo_options = 'data/embeddings/elmo/options.json'
-    elmo_weights = 'data/embeddings/elmo/model.hdf5'
-    checkpoints_directory = 'data/models/model_elmo/checkpoints'
-    serialization_directory = 'data/models/model_elmo'
+    elmo_options = '../data/embeddings/elmo/options.json'
+    elmo_weights = '../data/embeddings/elmo/model.hdf5'
+
+    checkpoints_directory = '../data/models/model_lstm_elmo/checkpoints'
+    serialization_directory = '../data/models/model_lstm_elmo'
+
+    name = 'BiLSTM+CRF+ELMo'
     elmo_embeddings = True
+    gru = False
     cuda = True
     batch = 32
+    lr = .005
 
     model = NERModel(
+        name,
         vocab_dir,
         train_file,
         test_file,
+        use_gru_instead_of_lstm=gru,
         use_elmo_embeddings=elmo_embeddings,
         elmo_options_file=elmo_options,
         elmo_weights_file=elmo_weights,
         checkpoints_dir=checkpoints_directory,
         model_serialization_dir=serialization_directory,
-        use_gru_instead_of_lstm=True,
+        learning_rate=lr,
         use_cuda=cuda,
     )
 
-    model.fit(batch_size=batch, epochs=3)
+    model.fit(batch_size=batch, epochs=2)
 
-    model_checkpoint = 'data/models/model_elmo/best.th'
+    model_checkpoint = '../data/models/model_lstm_elmo/best.th'
     model.load_model_state(model_checkpoint)
 
-    res = model.predict('Я тебя люблю')
+    res = model.predict('Привет, мир!')
     print(res)
