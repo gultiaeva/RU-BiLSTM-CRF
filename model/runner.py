@@ -10,7 +10,7 @@ from common import MetricsLoggerCallback
 from common.utils import get_conllu_data_loader, get_string_reader
 from common.utils import get_cuda_device_if_available
 from common.utils import path_exists, create_dir_if_not_exists, is_empty_dir
-from common.vocabulary import load_vocab, build_vocab
+from common.vocabulary import load_vocab
 from model import BiLSTMCRF
 
 logging.getLogger(__name__)
@@ -36,8 +36,7 @@ class NERModel:
 
         # Vocabulary
         if not path_exists(vocabulary_dir) or is_empty_dir(vocabulary_dir):
-            logging.info(f'No vocabulary detected at {vocabulary_dir}. Building vocabulary...')
-            build_vocab(self.train_dataset_file, self.test_dataset_file, save_dir_path=vocabulary_dir)
+            FileNotFoundError(f'No vocabulary detected at {vocabulary_dir}. You have to build vocabulary first!')
 
         self.vocabulary = load_vocab(vocabulary_dir)
 
