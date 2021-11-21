@@ -23,12 +23,17 @@ class NERModel:
                  optimizer=None, checkpoints_dir=None, model_serialization_dir=None, use_cuda=True):
 
         self.model_name = model_name
+
+        # Datasets
         self.train_dataset_file = train_dataset_file
         self.test_dataset_file = test_dataset_file
+
+        # Pretrained ELMo embeddings
         self.use_elmo_embeddings = use_elmo_embeddings
         self.elmo_options_file = elmo_options_file
         self.elmo_weights_file = elmo_weights_file
 
+        # Serialization
         self.model_serialization_directory = model_serialization_dir
         if path_exists(model_serialization_dir):
             logging.info(f'Directory {model_serialization_dir} is not exists. Creating it...')
@@ -40,6 +45,7 @@ class NERModel:
 
         self.vocabulary = load_vocab(vocabulary_dir)
 
+        # Model
         self.model = BiLSTMCRF(
             self.vocabulary,
             use_elmo=use_elmo_embeddings,
@@ -53,15 +59,18 @@ class NERModel:
         model_description = self.get_info()
         logging.info(','.join(f'{k}={v}' for k, v in model_description.items()))
 
+        # CUDA settings
         if use_cuda:
             self.device = get_cuda_device_if_available()
             self.model.cuda(self.device)
         else:
             self.device = -1
 
+        # Optimizer init
         params = self.model.parameters()
         self.optimizer = optimizer or Adam(params, lr=learning_rate)
 
+        # Model checkpoints
         if checkpoints_dir:
             if not path_exists(checkpoints_dir):
                 create_dir_if_not_exists(checkpoints_dir)
