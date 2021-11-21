@@ -75,7 +75,7 @@ class NERModel:
         if checkpoints_dir:
             if not path_exists(checkpoints_dir):
                 create_dir_if_not_exists(checkpoints_dir)
-            self.checkpoints = Checkpointer(checkpoints_dir, save_every_num_seconds=3600)
+            self.checkpoints = Checkpointer(checkpoints_dir, save_every_num_seconds=3600, keep_most_recent_by_count=25)
         else:
             self.checkpoints = None
 
