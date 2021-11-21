@@ -25,12 +25,12 @@ def load_vocab(path_to_vocab_dir):
 
 
 if __name__ == '__main__':
-    train_path = '../data/dataset/train_data.conllu.gz'
-    test_path = '../data/dataset/test_data.conllu.gz'
-    validation_path = '../data/dataset/validation_data.conllu.gz'
+    train_path = 'data/dataset/train_data.conllu.gz'
+    test_path = 'data/dataset/test_data.conllu.gz'
+    validation_path = 'data/dataset/validation_data.conllu.gz'
     datasets_paths = [train_path, test_path, validation_path]
 
-    vocab_dir = '../data/vocab'
+    vocab_dir = 'data/vocab'
 
     build_vocab(*datasets_paths, save_dir_path=vocab_dir)
 
