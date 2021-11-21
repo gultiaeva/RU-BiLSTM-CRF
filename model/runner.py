@@ -63,7 +63,7 @@ class NERModel:
         self.optimizer = optimizer or Adam(params, lr=learning_rate)
 
         if checkpoints_dir:
-            if path_exists(checkpoints_dir):
+            if not path_exists(checkpoints_dir):
                 create_dir_if_not_exists(checkpoints_dir)
             self.checkpoints = Checkpointer(checkpoints_dir, save_every_num_seconds=3600)
         else:
