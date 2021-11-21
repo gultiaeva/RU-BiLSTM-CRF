@@ -14,7 +14,7 @@ from allennlp_models.tagging import CrfTagger
 class BiLSTMCRF(CrfTagger):
     def __init__(self, vocab,
                  use_elmo=False, elmo_options_file=None, elmo_weights_file=None,
-                 use_gru_instead_of_lstm=False, embed_dim=172, hidden_dim=256, dropout=.2):
+                 use_gru_instead_of_lstm=False, embed_dim=172, hidden_dim=256, dropout=.1):
 
         self.use_elmo = use_elmo
         self.elmo_options_file = elmo_options_file
