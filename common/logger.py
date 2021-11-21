@@ -7,7 +7,7 @@ LOGS_DIR = 'logs'
 
 logging.getLogger().setLevel(logging.DEBUG)
 
-dt = datetime.now().strftime('%Y%m%d%H%M%S')
+dt = datetime.now().strftime('%Y_%m_%d__%H_%M_%S')
 filename = f'logs_{dt}.log'
 path_to_log = os.path.join(LOGS_DIR, filename)
 
