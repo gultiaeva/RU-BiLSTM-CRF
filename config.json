@@ -1,9 +1,9 @@
 {
-  "name": "Model",
+  "name": "BiLSTM+CRF+ELMo",
   "vocabulary": "data/vocab",
-  "train_data": "data/dataset/train_data.connlu.gz",
-  "test_data": "data/dataset/test_data.connlu.gz",
-  "validation_data": "data/dataset/validation_data.connlu.gz",
+  "train_data": "data/dataset/train_data.conllu.gz",
+  "test_data": "data/dataset/test_data.conllu.gz",
+  "validation_data": "data/dataset/validation_data.conllu.gz",
   "use_elmo": true,
   "elmo_options": "data/embeddings/elmo/options.json",
   "elmo_weights": "data/embeddings/elmo/model.hdf5",
