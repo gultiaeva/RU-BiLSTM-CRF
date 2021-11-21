@@ -1,0 +1,27 @@
+{
+  "name": "Model",
+  "vocabulary": "data/vocab",
+  "train_data": "data/dataset/train_data.connlu.gz",
+  "test_data": "data/dataset/test_data.connlu.gz",
+  "validation_data": "data/dataset/validation_data.connlu.gz",
+  "use_elmo": true,
+  "elmo_options": "data/embeddings/elmo/options.json",
+  "elmo_weights": "data/embeddings/elmo/model.hdf5",
+
+  "embed_dim": 172,
+  "hidden_dim": 256,
+  "dropout": 0.1,
+  "use_gru": false,
+
+  "n_epochs": 20,
+  "early_stopping_epochs": 3,
+  "batch_size": 32,
+  "batch_shuffle": false,
+  "max_instances_in_memory": 1000,
+
+  "serialization_dir": "data/models/model_lstm_elmo",
+  "checkpoints_dir": "data/models/model_lstm_elmo/checkpoints",
+
+  "use_cuda": true
+}
+
