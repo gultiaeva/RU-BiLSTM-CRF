@@ -43,6 +43,8 @@ class NERModel:
             hidden_dim=hidden_dim,
             dropout=dropout
         )
+        model_description = self.get_info()
+        logging.info(','.join(f'{k}={v}' for k, v in model_description.items()))
 
         if use_cuda:
             self.device = get_cuda_device_if_available()
@@ -60,6 +62,17 @@ class NERModel:
 
         self._is_predictor_initialized = False
         self._is_model_trained = False
+
+    def get_info(self):
+        info = {
+            'model_name': self.model_name,
+            'has_elmo_embeddings': self.use_elmo_embeddings,
+            'GRU': self.model.use_gru_instead_of_lstm,
+            'embedding_dim': self.model.embedding_dim,
+            'hidden_dim': self.model.hidden_dim,
+            'dropout': self.model.dropout.p
+        }
+        return info
 
     def load_model_state(self, checkpoint_path):
         with open(checkpoint_path, 'rb') as model_state:
@@ -105,6 +118,7 @@ class NERModel:
         trainer.train()
 
         self._is_model_trained = True
+        self.get_info()
 
     def _init_predictor(self):
         reader = SimpleStringReader()
