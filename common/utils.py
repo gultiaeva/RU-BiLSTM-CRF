@@ -1,4 +1,6 @@
 import logging
+import os
+import shutil
 
 from allennlp.data.data_loaders.multiprocess_data_loader import MultiProcessDataLoader
 from allennlp.data.token_indexers import ELMoTokenCharactersIndexer
@@ -7,6 +9,23 @@ from torch import cuda
 from common.dataset_reader import UniversalDependenciesDatasetReader, SimpleStringReader
 
 logging.getLogger(__name__)
+
+
+def wipe_dir(path_to_dir):
+    shutil.rmtree(path_to_dir, ignore_errors=True)
+
+
+def create_dir_if_not_exists(path_to_dir):
+    if not os.path.exists(path_to_dir):
+        os.mkdir(path_to_dir)
+
+
+def is_empty_dir(path_to_dir):
+    return bool(os.listdir(path_to_dir))
+
+
+def path_exists(path):
+    return os.path.exists(path)
 
 
 def get_cuda_device_if_available():

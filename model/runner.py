@@ -8,7 +8,8 @@ from torch.optim import Adam
 
 from common.utils import get_conllu_data_loader, get_string_reader
 from common.utils import get_cuda_device_if_available
-from common.vocabulary import load_vocab
+from common.utils import path_exists, create_dir_if_not_exists, is_empty_dir
+from common.vocabulary import load_vocab, build_vocab
 from model import BiLSTMCRF
 from common import MetricsLoggerCallback
 
@@ -25,11 +26,18 @@ class NERModel:
         self.train_dataset_file = train_dataset_file
         self.test_dataset_file = test_dataset_file
         self.use_elmo_embeddings = use_elmo_embeddings
-        if use_elmo_embeddings:
-            self.elmo_options_file = elmo_options_file
-            self.elmo_weights_file = elmo_weights_file
+        self.elmo_options_file = elmo_options_file
+        self.elmo_weights_file = elmo_weights_file
 
         self.model_serialization_directory = model_serialization_dir
+        if path_exists(model_serialization_dir):
+            logging.info(f'Directory {model_serialization_dir} is not exists. Creating it...')
+        create_dir_if_not_exists(model_serialization_dir)
+
+        # Vocabulary
+        if not path_exists(vocabulary_dir) or is_empty_dir(vocabulary_dir):
+            logging.info(f'No vocabulary detected at {vocabulary_dir}. Building vocabulary...')
+            build_vocab(self.train_dataset_file, self.test_dataset_file, save_dir_path=vocabulary_dir)
 
         self.vocabulary = load_vocab(vocabulary_dir)
 
@@ -56,6 +64,8 @@ class NERModel:
         self.optimizer = optimizer or Adam(params, lr=learning_rate)
 
         if checkpoints_dir:
+            if path_exists(checkpoints_dir):
+                create_dir_if_not_exists(checkpoints_dir)
             self.checkpoints = Checkpointer(checkpoints_dir, save_every_num_seconds=3600)
         else:
             self.checkpoints = None

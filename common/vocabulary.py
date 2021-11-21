@@ -1,14 +1,15 @@
 import logging
-import sys
 
 from allennlp.data.vocabulary import Vocabulary
 
 from common.dataset_reader import UniversalDependenciesDatasetReader
-
+from common.utils import wipe_dir
 logging.getLogger(__name__)
 
 
-def build_vocab(*paths, save_dir_path):
+def build_vocab(*paths, save_dir_path, overwrite=True):
+    if overwrite:
+        wipe_dir(save_dir_path)
     reader = UniversalDependenciesDatasetReader()
     vocabulary = Vocabulary()
     for path in paths:
