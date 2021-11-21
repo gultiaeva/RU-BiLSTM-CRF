@@ -21,7 +21,7 @@ def create_dir_if_not_exists(path_to_dir):
 
 
 def is_empty_dir(path_to_dir):
-    return bool(os.listdir(path_to_dir))
+    return not bool(os.listdir(path_to_dir))
 
 
 def path_exists(path):
