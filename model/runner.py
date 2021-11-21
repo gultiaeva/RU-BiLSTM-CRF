@@ -35,7 +35,7 @@ class NERModel:
 
         # Serialization
         self.model_serialization_directory = model_serialization_dir
-        if path_exists(model_serialization_dir):
+        if self.model_serialization_directory and not path_exists(model_serialization_dir):
             logging.info(f'Directory {model_serialization_dir} is not exists. Creating it...')
         create_dir_if_not_exists(model_serialization_dir)
 
