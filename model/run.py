@@ -16,11 +16,12 @@ logging.getLogger(__name__)
 
 
 class NERModel:
-    def __init__(self, vocabulary_dir, train_dataset_file, test_dataset_file,
+    def __init__(self, model_name, vocabulary_dir, train_dataset_file, test_dataset_file,
                  use_elmo_embeddings=False, elmo_options_file=None, elmo_weights_file=None,
                  use_gru_instead_of_lstm=False, embedding_dim=172, hidden_dim=128, dropout=.1, learning_rate=0.01,
                  optimizer=None, checkpoints_dir=None, model_serialization_dir=None, use_cuda=True):
 
+        self.model_name = model_name
         self.train_dataset_file = train_dataset_file
         self.test_dataset_file = test_dataset_file
         self.use_elmo_embeddings = use_elmo_embeddings
