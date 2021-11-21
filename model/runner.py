@@ -80,7 +80,7 @@ class NERModel:
             self.model.load_state_dict(state_dict)
         self._is_model_trained = True
 
-    def fit(self, epochs=5, early_stopping_patience=10, batch_size=256, shuffle=False, max_instances_in_memory=1000):
+    def fit(self, epochs=20, early_stopping_patience=3, batch_size=256, shuffle=False, max_instances_in_memory=1000):
 
         data_loader_train = get_conllu_data_loader(
             path_to_data=self.train_dataset_file,
