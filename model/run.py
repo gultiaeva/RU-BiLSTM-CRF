@@ -11,6 +11,7 @@ from common.dataset_reader import SimpleStringReader
 from common.utils import get_cuda_device_if_available
 from common.vocabulary import load_vocab
 from model import BiLSTMCRF
+from common import MetricsLoggerCallback
 
 logging.getLogger(__name__)
 
@@ -103,6 +104,12 @@ class NERModel:
             data_loader_train.set_target_device(self.device)
             data_loader_test.set_target_device(self.device)
 
+        callback = MetricsLoggerCallback(
+            self.model_serialization_directory,
+            summary_interval=10,
+            should_log_parameter_statistics=False
+        )
+
         trainer = GradientDescentTrainer(
             model=self.model,
             optimizer=self.optimizer,
@@ -110,6 +117,7 @@ class NERModel:
             validation_data_loader=data_loader_test,
             patience=early_stopping_patience,
             num_epochs=epochs,
+            callbacks=[callback],
             serialization_dir=self.model_serialization_directory,
             checkpointer=self.checkpoints,
             cuda_device=self.device
