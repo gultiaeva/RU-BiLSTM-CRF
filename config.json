@@ -13,6 +13,7 @@
   "dropout": 0.1,
   "use_gru": false,
 
+  "learning_rate": 0.005,
   "n_epochs": 20,
   "early_stopping_epochs": 3,
   "batch_size": 32,

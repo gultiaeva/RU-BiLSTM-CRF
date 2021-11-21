@@ -26,6 +26,7 @@ class Config:
     use_gru: bool
 
     # Training
+    learning_rate: float
     n_epochs: int
     early_stopping_epochs: int
     batch_size: int
