@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from typing import Dict, Any
 
 import torch.nn as nn
 from allennlp.models import Model
@@ -16,29 +15,31 @@ class BiLSTMCRF(CrfTagger):
                  use_elmo=False, elmo_options_file=None, elmo_weights_file=None,
                  use_gru_instead_of_lstm=False, embed_dim=172, hidden_dim=256, dropout=.1):
 
+        self.use_gru_instead_of_lstm = use_gru_instead_of_lstm
         self.use_elmo = use_elmo
         self.elmo_options_file = elmo_options_file
         self.elmo_weights_file = elmo_weights_file
         self.hidden_dim = hidden_dim
+        self.embedding_dim = embed_dim
 
         if self.use_elmo:
             token_embedding = ElmoTokenEmbedder(
                 options_file=self.elmo_options_file,
                 weight_file=self.elmo_weights_file
             )
-            embed_dim = token_embedding.output_dim
+            self.embedding_dim = token_embedding.output_dim
+            word_embeddings = BasicTextFieldEmbedder({'elmo_tokens': token_embedding})
         else:
             token_embedding = Embedding(
                 num_embeddings=vocab.get_vocab_size('tokens'),
-                embedding_dim=embed_dim
+                embedding_dim=self.embedding_dim
             )
+            word_embeddings = BasicTextFieldEmbedder({'tokens': token_embedding})
 
-        word_embeddings = BasicTextFieldEmbedder({'tokens': token_embedding})
-
-        recurrent_layer = nn.GRU if use_gru_instead_of_lstm else nn.LSTM
+        recurrent_layer = nn.GRU if self.use_gru_instead_of_lstm else nn.LSTM
         bidirectional_lstm = recurrent_layer(
-            embed_dim,
-            hidden_dim,
+            self.embedding_dim,
+            self.hidden_dim,
             batch_first=True,
             bidirectional=True
         )
