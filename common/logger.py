@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 
-LOGS_DIR = '../logs'
+LOGS_DIR = 'logs'
 
 logging.getLogger().setLevel(logging.DEBUG)
 

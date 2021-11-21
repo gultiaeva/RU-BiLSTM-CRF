@@ -149,15 +149,15 @@ class NERModel:
 
 
 if __name__ == '__main__':
-    vocab_dir = '../data/vocab'
-    train_file = '../data/dataset/train_data.conllu.gz'
-    test_file = '../data/dataset/test_data.conllu.gz'
+    vocab_dir = 'data/vocab'
+    train_file = 'data/dataset/train_data.conllu.gz'
+    test_file = 'data/dataset/test_data.conllu.gz'
 
-    elmo_options = '../data/embeddings/elmo/options.json'
-    elmo_weights = '../data/embeddings/elmo/model.hdf5'
+    elmo_options = 'data/embeddings/elmo/options.json'
+    elmo_weights = 'data/embeddings/elmo/model.hdf5'
 
-    checkpoints_directory = '../data/models/model_lstm_elmo/checkpoints'
-    serialization_directory = '../data/models/model_lstm_elmo'
+    checkpoints_directory = 'data/models/model_lstm_elmo1/checkpoints'
+    serialization_directory = 'data/models/model_lstm_elmo1'
 
     name = 'BiLSTM+CRF+ELMo'
     elmo_embeddings = True
@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
     model.fit(batch_size=batch, epochs=2)
 
-    model_checkpoint = '../data/models/model_lstm_elmo/best.th'
+    model_checkpoint = 'data/models/model_lstm_elmo/best.th'
     model.load_model_state(model_checkpoint)
 
     res = model.predict('Привет, мир!')
