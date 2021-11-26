@@ -51,7 +51,9 @@ def is_empty_dir(path_to_dir: str) -> bool:
     :return: True if directory is empty else False
     :rtype: bool
     """
-    return not bool(os.listdir(path_to_dir))
+    # List files except hidden (starting with ".")
+    files = list(filter(lambda x: not x.startswith('.'), os.listdir(path_to_dir)))
+    return not bool(files)
 
 
 def path_exists(path: str) -> bool:
