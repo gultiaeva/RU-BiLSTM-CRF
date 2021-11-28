@@ -1,22 +1,25 @@
 # RU-BiLSTM-CRF
-Implementation of Bidierctional LSTM + CRF (Conditional Random Field) for Named Entity Recognition in Russian.
+Реализация двунаправленной LSTM + CRF (Условное Случайное Поле) для задачи распознавания именованных сущностей на русском языке.
 
 [![forthebadge](https://forthebadge.com/images/badges/designed-in-ms-paint.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
 
-## Requirements:
+
+## Зависимости:
 1. [PyTorch](https://pytorch.org/docs/stable/index.html)
 2. [AllenNLP](https://docs.allennlp.org/main/)*
 3. [AllenNLP models](https://docs.allennlp.org/models/v1.1.0/)
 
-***Note**: AllenNLP package already contains PyTorch but with no GPU support.  
-Install any compatible with your GPU version of PyTorch from [here](https://pytorch.org/get-started/locally/).
+***Важно**: Пакет AllenNLP уже имеет в своем составе PyTorch, но без поддержки вычислений на GPU.  
+Чтобы иметь возможность производить вычисления на GPU, необходимо сначала установить соответствующую версию PyTorch [отсюда](https://pytorch.org/get-started/locally/).
 
-## Dataset info:
-[nerus](https://github.com/natasha/nerus/) from [natasha](https://github.com/natasha) project dataset was used for training.  
-It contains over 700k texts from Lenta.ru.  
-Markup is stored in the standard [CoNLL-U](https://universaldependencies.org/format.html) format.
+
+## Информация о наборе данных:
+Для обучения нейронной сети использовался набор данных [nerus](https://github.com/natasha/nerus/) от проекта [natasha](https://github.com/natasha).
+Корпус включает в себя более 700 тыс. текстов с сайта Lenta.ru.
+Разметка корпуса имеет формат [CoNLL-U](https://universaldependencies.org/format.html).
+
 ```
 $ zcat data/dataset/dataset.conllu.gz | head -40
 # newdoc id = 0
@@ -61,18 +64,19 @@ $ zcat data/dataset/dataset.conllu.gz | head -40
 11      смерти  _       NOUN    _       Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing10       nmod    _       Tag=O
 ```
 
-### Download:
+### Скачать набор данных:
 [nerus_lenta.conllu.gz](https://storage.yandexcloud.net/natasha-nerus/data/nerus_lenta.conllu.gz)
 
 
-## Embeddings:
-Neural network can be trained with [ELMo](https://en.wikipedia.org/wiki/ELMo) embeddings.  
-You can download any pretrained model from [here](http://vectors.nlpl.eu/repository/20/212.zip).
+## Векторные представления слов (эмбеддинги):
+Нейронная сеть может быть обучена с использованием предварительно обученных векторных представлений слов [ELMo](https://en.wikipedia.org/wiki/ELMo).  
+Предобученную модель векторных представлений слов можно скачать [здесь](http://vectors.nlpl.eu/repository/20/212.zip).
+
 
 ## Usage:
-1. Download dataset and split it to train/test/validation subsets.
-2. Download ELMo embeddings if you are going to use them.
-3. Configure [config.json](config.json). Specify name of your model, paths to datasets/embeddings, model serialization and checkpoints paths, model and training parameters.
-4. Run [main.py](main.py)
-5. Wait until training is done.
-6. Enjoy!
+1. Скачайте набор данных, разбейте его на обучающую, тестовую и валидационную выборку в нужных Вам пропорциях.
+2. Скачайте модель векторных представлений слов, если Вы собираетесь ее использовать.
+3. Настройте [config.json](config.json). Укажите имя модели, пути к выборкам, место сериализации модели и сохранения контрольных точек, гиперпараметры модели и процесса обучения.
+4. Запустите [main.py](main.py)
+5. Дождитесь окончания процесса обучения.
+6. Готово!
