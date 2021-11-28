@@ -37,6 +37,7 @@ def main() -> None:
         model_serialization_dir=configuration.serialization_dir,
         use_cuda=configuration.use_cuda
     )
+
     model.fit(
         epochs=configuration.n_epochs,
         early_stopping_patience=configuration.early_stopping_epochs,
@@ -44,6 +45,8 @@ def main() -> None:
         shuffle=configuration.batch_shuffle,
         max_instances_in_memory=configuration.max_instances_in_memory
     )
+
+    logging.info('Training done!')
 
 
 if __name__ == '__main__':
