@@ -89,6 +89,30 @@ def get_cuda_device_if_available() -> torch.types.Device:
     return device(cuda_device)
 
 
+def replace_string(string: str, from_idx: int, to_idx: int, repl: str) -> str:
+    """
+    Replaces specified part of `string` from `from_idx` to `to_idx` with `repl` string.
+    Example:
+        >>> input_string = 'abcde123fghij'
+        >>> result_string = replace_string(input_string, 5, 8, '000000000')
+        >>> print(result_string)
+        abcde000000000fghij
+
+    :param string: Original string which need replacing.
+    :type string: str
+    :param from_idx: Start index to replace from original string. (Inclusive)
+    :type from_idx: int
+    :param to_idx: End index to replace from original string. (Not inclusive)
+    :type to_idx: int
+    :param repl: String to put instead of `string[from_idx:to_idx]`
+    :type repl: str
+
+    :return: Replaced string
+    :rtype: str
+    """
+    return string[:from_idx] + repl + string[to_idx:]
+
+
 def get_conllu_data_loader(path_to_data: str,
                            index_with_vocab: Vocabulary,
                            batch_size: Union[int, None] = None,

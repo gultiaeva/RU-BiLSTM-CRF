@@ -1,6 +1,7 @@
 import logging
 from typing import Union, Dict, Any
 
+import spacy
 import torch
 from allennlp.predictors import SentenceTaggerPredictor
 from allennlp.training.checkpointer import Checkpointer
@@ -9,6 +10,7 @@ from torch import device
 from torch.optim import Adam, Optimizer
 
 from common import MetricsLoggerCallback
+from common.utils import replace_string
 from common.utils import get_conllu_data_loader, get_string_reader
 from common.utils import get_cuda_device_if_available
 from common.utils import path_exists, create_dir_if_not_exists, is_empty_dir
@@ -145,6 +147,7 @@ class NERModel:
 
         self._is_predictor_initialized = False
         self._is_model_trained = False
+        self._spacy_tokenizer_name = 'ru_core_news_sm'
 
     def get_info(self) -> Dict[str, Any]:
         """
@@ -251,8 +254,65 @@ class NERModel:
         :return: None
         """
         reader = get_string_reader(use_elmo_token_indexer=self.use_elmo_embeddings)
-        self._predictor = SentenceTaggerPredictor(self.model, reader, language='ru_core_news_sm')
+        self._tokenizer = spacy.load(self._spacy_tokenizer_name)
+        self._predictor = SentenceTaggerPredictor(self.model, reader, language=self._spacy_tokenizer_name)
         self._predictor_initialized = True
+
+    def anonymize_sentence(self, sentence: str) -> str:
+        """
+        Replaces all Named Entities with their types.
+        Example:
+            >>> input_string = 'Иван Васильевич меняет профессию'
+            >>> result_string = model.anonymize_sentence(input_string)
+            >>> print(result_string)
+            '[PER] меняет профессию'
+
+        :param sentence: String that need to be anonymized
+        :type sentence: str
+
+        :return: String with deleted Named Entities
+        :rtype: str
+        """
+        # Check if model is fitted and predictor initialized (for first method run)
+        assert self._is_model_trained, 'Model is not trained! You must fit model first.'
+        if not self._is_predictor_initialized:
+            self._init_predictor()
+
+        # Get token indices and lengths from original string using the same spacy tokenizer as .predict
+        tokens_info = {token.i: (token.idx, len(token)) for token in self._tokenizer(sentence)}
+        # Get predicted token tags
+        prediction = self.predict(sentence)
+        tags = prediction['tags']
+
+        tags_to_replace = []  # List of (tag, [start_idx, end_idx]). Start and end indices are from original string
+        prev_tag_grp = 'O'
+        for i, tag in enumerate(tags):
+            # Skip if tagged as O
+            if tag == 'O':
+                continue
+            # Get rid of "B-" and "I-" in tags names.
+            tag_grp = tag[-3:]
+            # Merge complex B->I->...->I sequences into one tag. e.g. B-LOC -> I-LOC -> I-LOC will be merged as one LOC
+            if tag_grp != prev_tag_grp:
+                # If new tag encountered then get its start and end positions
+                from_idx, length = tokens_info[i]
+                append_obj = tag_grp, [from_idx, from_idx+length]
+                tags_to_replace.append(append_obj)
+                prev_tag_grp = tag_grp
+            else:
+                # If tag is a part of a sequence then replace last tag end index with end index of a current tag
+                from_idx, length = tokens_info[i]
+                last_tag = tags_to_replace[-1]
+                last_tag_indices = last_tag[-1]
+                last_tag_indices[-1] = from_idx + length
+
+        # Replace original string with tags
+        sent = sentence
+        for named_entity_type, (from_idx, to_idx) in reversed(tags_to_replace):
+            named_entity_type_repl = f'[{named_entity_type}]'
+            sent = replace_string(sent, from_idx, to_idx, named_entity_type_repl)
+
+        return sent
 
     def predict(self, sentence: str) -> Dict[str, Any]:
         """
