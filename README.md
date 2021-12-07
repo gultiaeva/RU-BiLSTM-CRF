@@ -1,6 +1,8 @@
 # RU-BiLSTM-CRF
 Implementation of Bidierctional LSTM + CRF (Conditional Random Field) for Named Entity Recognition in Russian.
 
+Русская версия описания [тут](README_RU.md).
+
 [![forthebadge](https://forthebadge.com/images/badges/designed-in-ms-paint.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)

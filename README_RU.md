@@ -1,6 +1,8 @@
 # RU-BiLSTM-CRF
 Реализация двунаправленной LSTM + CRF (Условное Случайное Поле) для задачи распознавания именованных сущностей на русском языке.
 
+English version [here](README.md).
+
 [![forthebadge](https://forthebadge.com/images/badges/designed-in-ms-paint.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
