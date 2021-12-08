@@ -290,6 +290,7 @@ class NERModel:
         for i, tag in enumerate(tags):
             # Skip if tagged as O
             if tag == 'O':
+                prev_tag_grp = 'O'
                 continue
             # Get rid of "B-" and "I-" in tags names.
             tag_grp = tag[-3:]
