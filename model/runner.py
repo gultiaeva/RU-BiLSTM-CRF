@@ -1,8 +1,8 @@
 import logging
 from typing import Union, Dict, Any
 
-import spacy
 import torch
+from allennlp.data.tokenizers.spacy_tokenizer import SpacyTokenizer
 from allennlp.predictors import SentenceTaggerPredictor
 from allennlp.training.checkpointer import Checkpointer
 from allennlp.training.gradient_descent_trainer import GradientDescentTrainer
@@ -10,10 +10,10 @@ from torch import device
 from torch.optim import Adam, Optimizer
 
 from common import MetricsLoggerCallback
-from common.utils import replace_string
 from common.utils import get_conllu_data_loader, get_string_reader
 from common.utils import get_cuda_device_if_available
 from common.utils import path_exists, create_dir_if_not_exists, is_empty_dir
+from common.utils import replace_string
 from common.vocabulary import load_vocab
 from model import BiLSTMCRF
 
@@ -255,7 +255,7 @@ class NERModel:
         :return: None
         """
         reader = get_string_reader(use_elmo_token_indexer=self.use_elmo_embeddings)
-        self._tokenizer = spacy.load(self._spacy_tokenizer_name)
+        self._tokenizer = SpacyTokenizer(language=self._spacy_tokenizer_name)
         self._predictor = SentenceTaggerPredictor(self.model, reader, language=self._spacy_tokenizer_name)
         self._is_predictor_initialized = True
 
@@ -267,7 +267,6 @@ class NERModel:
             >>> result_string = model.anonymize_sentence(input_string)
             >>> print(result_string)
             '[PER] меняет профессию'
-
         :param sentence: String that need to be anonymized
         :type sentence: str
 
@@ -280,7 +279,7 @@ class NERModel:
             self._init_predictor()
 
         # Get token indices and lengths from original string using the same spacy tokenizer as .predict
-        tokens_info = {token.i: (token.idx, len(token)) for token in self._tokenizer(sentence)}
+        tokens_info = {i: (token.idx, token.idx_end) for i, token in enumerate(self._tokenizer.tokenize(sentence))}
         # Get predicted token tags
         prediction = self.predict(sentence)
         tags = prediction['tags']
@@ -297,16 +296,16 @@ class NERModel:
             # Merge complex B->I->...->I sequences into one tag. e.g. B-LOC -> I-LOC -> I-LOC will be merged as one LOC
             if tag_grp != prev_tag_grp:
                 # If new tag encountered then get its start and end positions
-                from_idx, length = tokens_info[i]
-                append_obj = tag_grp, [from_idx, from_idx+length]
+                from_idx, to_tdx = tokens_info[i]
+                append_obj = tag_grp, [from_idx, to_tdx]
                 tags_to_replace.append(append_obj)
                 prev_tag_grp = tag_grp
             else:
                 # If tag is a part of a sequence then replace last tag end index with end index of a current tag
-                from_idx, length = tokens_info[i]
+                from_idx, to_tdx = tokens_info[i]
                 last_tag = tags_to_replace[-1]
                 last_tag_indices = last_tag[-1]
-                last_tag_indices[-1] = from_idx + length
+                last_tag_indices[-1] = to_tdx
 
         # Replace original string with tags
         sent = sentence
