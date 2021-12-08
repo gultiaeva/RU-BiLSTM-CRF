@@ -129,9 +129,10 @@ class NERModel:
         # CUDA settings
         if use_cuda:
             self.device = get_cuda_device_if_available()
-            self.model.cuda(self.device)
         else:
             self.device = device('cpu')
+
+        self.model.to(self.device)
 
         # Optimizer init
         params = self.model.parameters()
@@ -174,7 +175,7 @@ class NERModel:
         :return:
         """
         with open(checkpoint_path, 'rb') as model_state:
-            state_dict = torch.load(model_state)
+            state_dict = torch.load(model_state, map_location=self.device)
             self.model.load_state_dict(state_dict)
         self._is_model_trained = True
 
