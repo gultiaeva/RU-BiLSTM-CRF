@@ -257,7 +257,7 @@ class NERModel:
         reader = get_string_reader(use_elmo_token_indexer=self.use_elmo_embeddings)
         self._tokenizer = spacy.load(self._spacy_tokenizer_name)
         self._predictor = SentenceTaggerPredictor(self.model, reader, language=self._spacy_tokenizer_name)
-        self._predictor_initialized = True
+        self._is_predictor_initialized = True
 
     def anonymize_sentence(self, sentence: str) -> str:
         """
